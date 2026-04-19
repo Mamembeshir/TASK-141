@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21754" systemVersion="22A380" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+
+    <entity name="User" representedClassName="User" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="username" attributeType="String"/>
+        <attribute name="role" attributeType="String"/>
+        <attribute name="status" attributeType="String" defaultValueString="ACTIVE"/>
+        <attribute name="failedLoginCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="lockedUntil" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="biometricEnabled" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="version" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="orders" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Order" inverseName="cashier" inverseEntity="Order"/>
+        <relationship name="createdSPUs" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ProductSPU" inverseName="createdBy" inverseEntity="ProductSPU"/>
+        <relationship name="propertyListings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PropertyListing" inverseName="createdBy" inverseEntity="PropertyListing"/>
+        <relationship name="propertyChanges" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PropertyChangeHistory" inverseName="changedBy" inverseEntity="PropertyChangeHistory"/>
+        <relationship name="checkIns" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CheckInLog" inverseName="scannedBy" inverseEntity="CheckInLog"/>
+        <relationship name="uploadedAttachments" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Attachment" inverseName="uploadedBy" inverseEntity="Attachment"/>
+        <relationship name="auditLogs" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="AuditLog" inverseName="actor" inverseEntity="AuditLog"/>
+        <relationship name="learningContent" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="LearningContent" inverseName="createdBy" inverseEntity="LearningContent"/>
+    </entity>
+
+    <entity name="ProductSPU" representedClassName="ProductSPU" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="description_" optional="YES" attributeType="String"/>
+        <attribute name="category" optional="YES" attributeType="String"/>
+        <attribute name="isListed" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="listingStatus" attributeType="String" defaultValueString="DRAFT"/>
+        <attribute name="rejectionNotes" optional="YES" attributeType="String"/>
+        <attribute name="reviewerID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="reviewedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="pendingDelist" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="lowStockThreshold" attributeType="Integer 32" defaultValueString="10" usesScalarValueType="YES"/>
+        <attribute name="version" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="skus" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ProductSKU" inverseName="spu" inverseEntity="ProductSKU"/>
+        <relationship name="createdBy" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="createdSPUs" inverseEntity="User"/>
+    </entity>
+
+    <entity name="ProductSKU" representedClassName="ProductSKU" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="barcode" attributeType="String"/>
+        <attribute name="stemCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="wrapType" optional="YES" attributeType="String"/>
+        <attribute name="color" optional="YES" attributeType="String"/>
+        <attribute name="priceCents" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="isTaxable" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="isActive" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="version" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="spu" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ProductSPU" inverseName="skus" inverseEntity="ProductSPU"/>
+        <relationship name="inventoryLots" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="InventoryLot" inverseName="sku" inverseEntity="InventoryLot"/>
+        <relationship name="orderLineItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="OrderLineItem" inverseName="sku" inverseEntity="OrderLineItem"/>
+    </entity>
+
+    <entity name="InventoryLot" representedClassName="InventoryLot" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="onHand" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="reservedCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="lotDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="expiryDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="version" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="sku" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ProductSKU" inverseName="inventoryLots" inverseEntity="ProductSKU"/>
+    </entity>
+
+    <entity name="PriceRule" representedClassName="PriceRule" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="discountType" attributeType="String"/>
+        <attribute name="discountValue" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="appliesTo" attributeType="String"/>
+        <attribute name="maxDiscountPercent" attributeType="Integer 16" defaultValueString="30" usesScalarValueType="YES"/>
+        <attribute name="isActive" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="version" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="coupons" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Coupon" inverseName="priceRule" inverseEntity="Coupon"/>
+    </entity>
+
+    <entity name="Coupon" representedClassName="Coupon" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="code" attributeType="String"/>
+        <attribute name="validFrom" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="validTo" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="maxUses" attributeType="Integer 32" defaultValueString="1" usesScalarValueType="YES"/>
+        <attribute name="currentUses" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="version" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="priceRule" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PriceRule" inverseName="coupons" inverseEntity="PriceRule"/>
+    </entity>
+
+    <entity name="Order" representedClassName="Order" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="orderNumber" attributeType="String"/>
+        <attribute name="status" attributeType="String" defaultValueString="OPEN"/>
+        <attribute name="subtotalCents" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="discountCents" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="taxCents" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="totalCents" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="parkedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="completedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="originalOrderNumber" optional="YES" attributeType="String"/>
+        <attribute name="couponCode" optional="YES" attributeType="String"/>
+        <attribute name="orderDiscountPercent" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="version" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="lineItems" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="OrderLineItem" inverseName="order" inverseEntity="OrderLineItem"/>
+        <relationship name="payments" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="PaymentRecord" inverseName="order" inverseEntity="PaymentRecord"/>
+        <relationship name="cashier" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="orders" inverseEntity="User"/>
+    </entity>
+
+    <entity name="OrderLineItem" representedClassName="OrderLineItem" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="quantity" attributeType="Integer 16" defaultValueString="1" usesScalarValueType="YES"/>
+        <attribute name="unitPriceCents" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="discountCents" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="lineTotalCents" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="sortOrder" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="order" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Order" inverseName="lineItems" inverseEntity="Order"/>
+        <relationship name="sku" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ProductSKU" inverseName="orderLineItems" inverseEntity="ProductSKU"/>
+    </entity>
+
+    <entity name="PaymentRecord" representedClassName="PaymentRecord" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="tenderType" attributeType="String"/>
+        <attribute name="amountCents" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="referenceMemo" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="order" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Order" inverseName="payments" inverseEntity="Order"/>
+    </entity>
+
+    <entity name="TicketEvent" representedClassName="TicketEvent" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="venue" optional="YES" attributeType="String"/>
+        <attribute name="eventDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="doorOpenTime" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="doorCloseTime" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="totalCapacity" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="soldCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="checkedInCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="status" attributeType="String" defaultValueString="DRAFT"/>
+        <attribute name="version" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="tickets" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ETicket" inverseName="event" inverseEntity="ETicket"/>
+    </entity>
+
+    <entity name="ETicket" representedClassName="ETicket" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="ticketNumber" attributeType="String"/>
+        <attribute name="holderName" optional="YES" attributeType="String"/>
+        <attribute name="qrPayload" attributeType="String"/>
+        <attribute name="antiCounterfeitSignature" attributeType="String"/>
+        <attribute name="status" attributeType="String" defaultValueString="VALID"/>
+        <attribute name="validFrom" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="validTo" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="purchasedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="version" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="event" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TicketEvent" inverseName="tickets" inverseEntity="TicketEvent"/>
+        <relationship name="checkInLogs" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CheckInLog" inverseName="ticket" inverseEntity="CheckInLog"/>
+    </entity>
+
+    <entity name="CheckInLog" representedClassName="CheckInLog" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="scannedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="result" attributeType="String"/>
+        <attribute name="deviceInfo" optional="YES" attributeType="String"/>
+        <relationship name="ticket" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ETicket" inverseName="checkInLogs" inverseEntity="ETicket"/>
+        <relationship name="scannedBy" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="checkIns" inverseEntity="User"/>
+    </entity>
+
+    <entity name="PropertyListing" representedClassName="PropertyListing" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="title" attributeType="String"/>
+        <attribute name="addressLine1" attributeType="String"/>
+        <attribute name="addressLine2" optional="YES" attributeType="String"/>
+        <attribute name="city" attributeType="String"/>
+        <attribute name="state" attributeType="String"/>
+        <attribute name="zipCode" attributeType="String"/>
+        <attribute name="squareFootage" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="amenities" optional="YES" attributeType="String"/>
+        <attribute name="rentCents" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="depositCents" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="leaseTermMonths" attributeType="Integer 16" defaultValueString="12" usesScalarValueType="YES"/>
+        <attribute name="availableFrom" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="status" attributeType="String" defaultValueString="DRAFT"/>
+        <attribute name="version" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="createdBy" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="propertyListings" inverseEntity="User"/>
+        <relationship name="changeHistory" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="PropertyChangeHistory" inverseName="listing" inverseEntity="PropertyChangeHistory"/>
+    </entity>
+
+    <entity name="PropertyChangeHistory" representedClassName="PropertyChangeHistory" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="fieldName" attributeType="String"/>
+        <attribute name="oldValue" optional="YES" attributeType="String"/>
+        <attribute name="newValue" optional="YES" attributeType="String"/>
+        <attribute name="changedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="listing" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PropertyListing" inverseName="changeHistory" inverseEntity="PropertyListing"/>
+        <relationship name="changedBy" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="propertyChanges" inverseEntity="User"/>
+    </entity>
+
+    <entity name="Attachment" representedClassName="Attachment" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="parentType" attributeType="String"/>
+        <attribute name="parentID" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="fileName" attributeType="String"/>
+        <attribute name="filePath" attributeType="String"/>
+        <attribute name="fileSizeBytes" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="mimeType" attributeType="String"/>
+        <attribute name="checksumSHA256" attributeType="String"/>
+        <attribute name="thumbnailPath" optional="YES" attributeType="String"/>
+        <attribute name="isCompressed" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="licensingInfo" optional="YES" attributeType="String"/>
+        <attribute name="copyrightInfo" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="uploadedBy" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="uploadedAttachments" inverseEntity="User"/>
+    </entity>
+
+    <entity name="AuditLog" representedClassName="AuditLog" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="actorID" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="action" attributeType="String"/>
+        <attribute name="entityType" attributeType="String"/>
+        <attribute name="entityID" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="beforeJSON" optional="YES" attributeType="String"/>
+        <attribute name="afterJSON" optional="YES" attributeType="String"/>
+        <attribute name="timestamp" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="actor" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="auditLogs" inverseEntity="User"/>
+    </entity>
+
+    <entity name="LearningContent" representedClassName="LearningContent" syncable="YES">
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="title" attributeType="String"/>
+        <attribute name="body" attributeType="String"/>
+        <attribute name="category" optional="YES" attributeType="String"/>
+        <attribute name="status" attributeType="String" defaultValueString="DRAFT"/>
+        <attribute name="version" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="createdBy" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="learningContent" inverseEntity="User"/>
+    </entity>
+
+</model>
